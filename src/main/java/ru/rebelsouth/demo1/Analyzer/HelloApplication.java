@@ -1,4 +1,4 @@
-package ru.rebelsouth.demo1;
+package ru.rebelsouth.demo1.Analyzer;
 
 import javafx.application.Application;
 import javafx.concurrent.Task;
@@ -8,8 +8,6 @@ import javafx.scene.layout.VBox;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import ru.rebelsouth.demo1.Analyzer.DirectoryProcessor;
-import ru.rebelsouth.demo1.Analyzer.PrefixTree;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,7 +30,7 @@ public class HelloApplication extends Application {
         stage.setTitle("УБИЙЦА ПАПОК");
 
         depthInput = new TextArea();
-        depthInput.setPromptText("Введите глубину (6)");
+        depthInput.setPromptText("Введите глубину ");
         depthInput.setPrefHeight(40);
 
         Button loadFromFileButton = new Button("Загрузить ID из файла");
@@ -79,7 +77,7 @@ public class HelloApplication extends Application {
             File selectedDir = new DirectoryChooser().showDialog(stage);
             if (selectedDir != null) {
                 selectedPath = selectedDir.toPath();
-                statusLabel.setText("Selected: " + selectedPath);
+                statusLabel.setText("Выбрана: " + selectedPath);
             }
         });
 
@@ -96,38 +94,35 @@ public class HelloApplication extends Application {
                 String normalized = String.format("%0" + depth + "d", id);
                 prefixTree.insert(normalized);
             }
-            statusLabel.setText("Построено префиксное дерево с " + dbIds.size() + "вхождениями");
+            statusLabel.setText("Построено префиксное дерево с " + dbIds.size() + " вхождениями");
         });
 
         Button processButton = new Button("Очистка директорий");
         processButton.setOnAction(event -> {
             if (selectedPath == null) {
-                statusLabel.setText("Please select a directory first!");
+                statusLabel.setText("Сначала нужно выбрать директорию");
                 return;
             }
             if (depth == 0) {
-                statusLabel.setText("Please set depth first!");
+                statusLabel.setText("Сначала нужно выбрать глубину!");
                 return;
             }
             if (prefixTree.isEmpty()) {
-                statusLabel.setText("Please build prefix tree first!");
+                statusLabel.setText("Сначала нужно построить префиксное дерево!");
                 return;
             }
 
             progressBar.setProgress(0);
             progressBar.setVisible(true);
-            statusLabel.setText("Processing...");
+            statusLabel.setText("Выполнение...");
 
             Task<Void> task = new Task<>() {
                 @Override
                 protected Void call() throws Exception {
                     DirectoryProcessor processor = new DirectoryProcessor(selectedPath, depth);
 
-                    // Предположим, что ты хочешь обновлять прогресс вручную в методе
-                    // cleanFileSystem(prefixTree, progressCallback)
-                    // но если пока нет — просто симулируем прогресс:
                     for (int i = 1; i <= 10; i++) {
-                        Thread.sleep(100); // Симуляция работы
+                        Thread.sleep(100);
                         updateProgress(i, 10);
                     }
 
@@ -139,14 +134,14 @@ public class HelloApplication extends Application {
                 @Override
                 protected void succeeded() {
                     super.succeeded();
-                    statusLabel.setText("Processing completed successfully!");
+                    statusLabel.setText("Программа выполнена успешно!");
                     progressBar.setVisible(false);
                 }
 
                 @Override
                 protected void failed() {
                     super.failed();
-                    statusLabel.setText("Error: " + getException().getMessage());
+                    statusLabel.setText("Ошибка: " + getException().getMessage());
                     getException().printStackTrace();
                     progressBar.setVisible(false);
                 }
@@ -180,20 +175,20 @@ public class HelloApplication extends Application {
 //            }
 //        });
 
-        Button showTreeButton = new Button("Показать структуру дерева (хуево)");
-        showTreeButton.setOnAction(event -> {
-            if (prefixTree.isEmpty()) {
-                statusLabel.setText("Дерево пустое");
-            } else {
-                statusLabel.setText("Структура дерева:\n" + prefixTree.toString());
-            }
-        });
+//        Button showTreeButton = new Button("Показать структуру дерева (хуево)");
+//        showTreeButton.setOnAction(event -> {
+//            if (prefixTree.isEmpty()) {
+//                statusLabel.setText("Дерево пустое");
+//            } else {
+//                statusLabel.setText("Структура дерева:\n" + prefixTree.toString());
+//            }
+//        });
 
         statusLabel = new Label("Статус: Ожидание ввода");
         statusLabel.setWrapText(true);
 
         VBox root = new VBox(10,
-                new Label("Устройство обработки директорий"),
+                new Label("обработка папок"),
                 new Separator(),
                 depthInput,
                 setDepthButton,
@@ -203,7 +198,7 @@ public class HelloApplication extends Application {
                 chooseDirButton,
                 buildTreeButton,
                 processButton,
-                showTreeButton,
+//                showTreeButton,
                 new Separator(),
                 statusLabel
         );
